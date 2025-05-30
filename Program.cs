@@ -1,41 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <set>
 
-class Program
-{
-    static void Main()
-    {
-        // Пример данных
-        List<int> V0 = new List<int> { 1, 2, 3 }; // Вектор V0
-        List<List<int>> vectors = new List<List<int>> // Набор векторов V1, ..., VN
-        {
-            new List<int> { 1, 2, 3, 4 },
-            new List<int> { 2, 3, 5 },
-            new List<int> { 1, 2, 3 },
-            new List<int> { 1, 4, 5 }
-        };
+using namespace std;
 
-        int N = vectors.Count; // Количество векторов
-        int count = 0; // Счетчик подходящих векторов
+int main() {
+    // Ввод вектора V0
+    cout << "Enter elements of vector V0 (end with Ctrl+D/Ctrl+Z): ";
+    vector<int> V0((istream_iterator<int>(cin)), istream_iterator<int>());
+    cin.clear(); // Сброс флага EOF после ввода V0
 
-        // Преобразуем V0 в множество (для исключения повторений)
-        HashSet<int> setV0 = new HashSet<int>(V0);
-
-        // Перебираем каждый вектор из набора
-        for (int i = 0; i < N; i++)
-        {
-            // Преобразуем текущий вектор в множество
-            HashSet<int> setVi = new HashSet<int>(vectors[i]);
-
-            // Проверяем, содержатся ли все элементы setV0 в setVi
-            if (setV0.IsSubsetOf(setVi))
-            {
-                count++; // Увеличиваем счетчик, если условие выполняется
-            }
-        }
-
-        // Вывод результата
-        Console.WriteLine($"Количество векторов, содержащих все элементы V0: {count}");
+    // Ввод числа N
+    int N;
+    cout << "Enter N (>0): ";
+    cin >> N;
+    if (N <= 0) {
+        cerr << "Error: N must be positive!" << endl;
+        return 1;
     }
+
+    // Ввод векторов V1, ..., VN
+    vector<vector<int>> VI(N);
+    for (int i = 0; i < N; ++i) {
+        cout << "Enter elements of vector V" << i+1 << " (end with Ctrl+D/Ctrl+Z): ";
+        VI[i].assign(istream_iterator<int>(cin), istream_iterator<int>());
+        cin.clear();
+    }
+
+    // Создание множества из V0 (убираем дубликаты)
+    set<int> setV0(V0.begin(), V0.end());
+
+    // Подсчет векторов, содержащих все элементы V0
+    int count = 0;
+    for (const auto& vec : VI) {
+        set<int> setVI(vec.begin(), vec.end());
+        if (includes(setVI.begin(), setVI.end(), setV0.begin(), setV0.end())) {
+            ++count;
+        }
+    }
+
+    // Вывод результата
+    cout << "Number of vectors containing all elements of V0: " << count << endl;
+
+    return 0;
 }
