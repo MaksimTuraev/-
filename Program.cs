@@ -1,79 +1,64 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿#include <iostream>
+#include <fstream>
+#include <vector>
+#include <algorithm>
+#include <iterator>
+#include <string>
 
-struct Point
-{
-    public int X { get; set; }
-    public int Y { get; set; }
-    public string S { get; set; }
+using namespace std;
 
-    // Перегрузка оператора ввода
-    public static Point Parse(string input)
-    {
-        var parts = input.Split(' ');
-        if (parts.Length != 3)
-            throw new FormatException("Invalid input format for Point.");
+struct point {
+    int x;
+    int y;
+    string s;
 
-        return new Point
-        {
-            X = int.Parse(parts[0]),
-            Y = int.Parse(parts[1]),
-            S = parts[2]
-        };
+    // Оператор сравнения для порядка сортировки
+    bool operator<(const point& other) const {
+        return (x < other.x) || (x == other.x && y < other.y);
     }
+};
 
-    // Перегрузка оператора вывода
-    public override string ToString()
-    {
-        return $"{X} {Y} {S}";
-    }
-
-    // Реализация отношения порядка
-    public static bool operator <(Point a, Point b)
-    {
-        return a.X < b.X || (a.X == b.X && a.Y < b.Y);
-    }
-
-    public static bool operator >(Point a, Point b)
-    {
-        return !(a < b) && !(a.X == b.X && a.Y == b.Y);
-    }
+// Оператор ввода для структуры point
+istream& operator>>(istream& is, point& p) {
+    is >> p.x >> p.y >> p.s;
+    return is;
 }
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        string fileName = "points.txt";
+// Оператор вывода для структуры point
+ostream& operator<<(ostream& os, const point& p) {
+    os << p.x << " " << p.y << " " << p.s;
+    return os;
+}
 
-        // Чтение данных из файла
-        List<Point> points;
-        try
-        {
-            points = File.ReadAllLines(fileName)
-                         .Select(Point.Parse)
-                         .ToList();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ошибка при чтении файла: {ex.Message}");
-            return;
-        }
+int main() {
+    string filename;
+    cout << "Enter filename: ";
+    cin >> filename;
 
-        // Сортировка с учетом отношения порядка
-        var sortedPoints = points.OrderBy(p => p.X).ThenBy(p => p.Y).ToList();
-
-        // Запись отсортированных данных обратно в файл
-        try
-        {
-            File.WriteAllLines(fileName, sortedPoints.Select(p => p.ToString()));
-            Console.WriteLine("Данные успешно отсортированы и записаны обратно в файл.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Ошибка при записи файла: {ex.Message}");
-        }
+    // Чтение данных из файла
+    ifstream inFile(filename);
+    if (!inFile) {
+        cerr << "Error opening file: " << filename << endl;
+        return 1;
     }
+
+    vector<point> V;
+    copy(istream_iterator<point>(inFile), istream_iterator<point>(), back_inserter(V));
+    inFile.close();
+
+    // Сортировка с сохранением порядка элементов с одинаковыми ключами
+    stable_sort(V.begin(), V.end());
+
+    // Запись отсортированных данных обратно в файл
+    ofstream outFile(filename);
+    if (!outFile) {
+        cerr << "Error opening file for writing: " << filename << endl;
+        return 1;
+    }
+
+    copy(V.begin(), V.end(), ostream_iterator<point>(outFile, "\n"));
+    outFile.close();
+
+    cout << "File " << filename << " has been sorted successfully." << endl;
+    return 0;
 }
