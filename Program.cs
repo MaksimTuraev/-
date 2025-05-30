@@ -1,45 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿#include <iostream>
+#include <deque>
+#include <iterator>
+#include <algorithm>
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        // Исходный набор целых чисел с четным количеством элементов
-        int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8 };
+using namespace std;
 
-        // Проверяем, что количество элементов четное
-        if (numbers.Length % 2 != 0)
-        {
-            Console.WriteLine("Количество элементов должно быть четным.");
-            return;
-        }
+int main() {
+    cout << "Enter an even number of integers (end with Ctrl+D/Ctrl+Z): ";
 
-        // Заполняем дек D исходными числами
-        LinkedList<int> deque = new LinkedList<int>(numbers);
+    // Чтение чисел с помощью istream_iterator в дек
+    deque<int> D((istream_iterator<int>(cin)), istream_iterator<int>());
 
-        // Определяем середину дека
-        int mid = deque.Count / 2;
-
-        // Разделяем дек на две половины
-        var firstHalf = deque.Take(mid).Reverse(); // Первая половина в обратном порядке
-        var secondHalf = deque.Skip(mid).Take(mid).Reverse(); // Вторая половина в обратном порядке
-
-        // Выводим первую половину в обратном порядке
-        Console.WriteLine("Первая половина в обратном порядке:");
-        foreach (var item in firstHalf)
-        {
-            Console.Write(item + " ");
-        }
-        Console.WriteLine();
-
-        // Выводим вторую половину в обратном порядке
-        Console.WriteLine("Вторая половина в обратном порядке:");
-        foreach (var item in secondHalf)
-        {
-            Console.Write(item + " ");
-        }
-        Console.WriteLine();
+    if (D.size() % 2 != 0) {
+        cerr << "Error: The number of elements must be even!" << endl;
+        return 1;
     }
+
+    // Вывод первой половины в обратном порядке
+    cout << "First half (reversed): ";
+    copy(D.rbegin() + D.size() / 2, D.rend(), ostream_iterator<int>(cout, " "));
+
+    // Вывод второй половины в обратном порядке
+    cout << "\nSecond half (reversed): ";
+    copy(D.rbegin(), D.rbegin() + D.size() / 2, ostream_iterator<int>(cout, " "));
+
+    cout << endl;
+    return 0;
 }
