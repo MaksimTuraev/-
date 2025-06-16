@@ -3,27 +3,31 @@
 #include <iterator>
 #include <algorithm>
 
-using namespace std;
-
 int main() {
-    cout << "Enter an even number of integers (end with Ctrl+D/Ctrl+Z): ";
+    // Пример набора чисел с четным количеством элементов
+    std::deque<int> numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
 
-    // Чтение чисел с помощью istream_iterator в дек
-    deque<int> D((istream_iterator<int>(cin)), istream_iterator<int>());
+    // Заполняем дек D с использованием итераторов (аналог `ptin_iterator`)
+    std::deque<int> D(numbers.begin(), numbers.end());
 
-    if (D.size() % 2 != 0) {
-        cerr << "Error: The number of elements must be even!" << endl;
-        return 1;
-    }
+    // Вычисляем середину дека
+    size_t half = D.size() / 2;
 
-    // Вывод первой половины в обратном порядке
-    cout << "First half (reversed): ";
-    copy(D.rbegin() + D.size() / 2, D.rend(), ostream_iterator<int>(cout, " "));
+    // Выводим первую половину в обратном порядке
+    std::copy(
+        std::make_reverse_iterator(D.begin() + half),  // от середины до начала
+        D.rend(),                                      // конец первой половины
+        std::ostream_iterator<int>(std::cout, " ")     // вывод в консоль
+    );
 
-    // Вывод второй половины в обратном порядке
-    cout << "\nSecond half (reversed): ";
-    copy(D.rbegin(), D.rbegin() + D.size() / 2, ostream_iterator<int>(cout, " "));
+    // Выводим вторую половину в обратном порядке
+    std::copy(
+        std::make_reverse_iterator(D.end()),           // от конца до середины
+        std::make_reverse_iterator(D.begin() + half),  // конец второй половины
+        std::ostream_iterator<int>(std::cout, " ")     // вывод в консоль
+    );
 
-    cout << endl;
+    std::cout << std::endl;
+
     return 0;
 }
