@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <fstream>
 #include <vector>
 #include <algorithm>
@@ -7,58 +7,66 @@
 
 using namespace std;
 
+// Структура point
 struct point {
-    int x;
-    int y;
+    int x, y;
     string s;
 
-    // Оператор сравнения для порядка сортировки
+    // Оператор < для отношения порядка
     bool operator<(const point& other) const {
-        return (x < other.x) || (x == other.x && y < other.y);
+        if (x != other.x) return x < other.x;
+        return y < other.y;
     }
 };
 
-// Оператор ввода для структуры point
+// Оператор ввода (считывание из потока)
 istream& operator>>(istream& is, point& p) {
     is >> p.x >> p.y >> p.s;
     return is;
 }
 
-// Оператор вывода для структуры point
+// Оператор вывода (запись в поток)
 ostream& operator<<(ostream& os, const point& p) {
     os << p.x << " " << p.y << " " << p.s;
     return os;
 }
 
 int main() {
-    string filename;
-    cout << "Enter filename: ";
-    cin >> filename;
+    const string filename = "points.txt";  // Имя файла
 
-    // Чтение данных из файла
+    // Чтение данных из файла в вектор
     ifstream inFile(filename);
     if (!inFile) {
-        cerr << "Error opening file: " << filename << endl;
+        cerr << "Не удалось открыть файл " << filename << endl;
         return 1;
     }
 
     vector<point> V;
-    copy(istream_iterator<point>(inFile), istream_iterator<point>(), back_inserter(V));
+    copy(
+        istream_iterator<point>(inFile),
+        istream_iterator<point>(),
+        back_inserter(V)
+    );
     inFile.close();
 
-    // Сортировка с сохранением порядка элементов с одинаковыми ключами
+    // Сортировка вектора с сохранением порядка равных элементов
     stable_sort(V.begin(), V.end());
 
     // Запись отсортированных данных обратно в файл
     ofstream outFile(filename);
     if (!outFile) {
-        cerr << "Error opening file for writing: " << filename << endl;
+        cerr << "Не удалось открыть файл для записи " << filename << endl;
         return 1;
     }
 
-    copy(V.begin(), V.end(), ostream_iterator<point>(outFile, "\n"));
+    copy(
+        V.begin(),
+        V.end(),
+        ostream_iterator<point>(outFile, "\n")
+    );
     outFile.close();
 
-    cout << "File " << filename << " has been sorted successfully." << endl;
+    cout << "Файл успешно перезаписан с отсортированными данными." << endl;
+
     return 0;
 }
